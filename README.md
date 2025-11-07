@@ -22,3 +22,8 @@ Although modern high-throughput workflows now run in the cloud, the Staden appli
 ## Contributing and support
 This repository preserves the historic code base.  Modernising it for new platforms often requires updates to build scripts and GUI dependencies.  If you port the package to contemporary toolchains, please consider contributing patches or notes back through pull requests or the issue tracker.
 
+
+## Project status & modern context
+- **Last significant upstream activity**: circa 2016. No active maintainer is known.
+- **Legacy value**: reopening historic assemblies, reproducing published results, teaching classic sequencing pipelines.
+- **Modern alternatives**: tools such as SPAdes, Flye, Canu, Velvet (assembly) and IGV, Tablet, Bandage, Artemis/ACT (visualisation/curation) are actively maintained and easier to install.
