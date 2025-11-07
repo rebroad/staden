@@ -1,0 +1,121 @@
+---
+alwaysApply: false
+description: Development workflow and best practices for the Staden Package
+---
+# Development Workflow and Best Practices
+
+## Before Making Changes
+1. **Check git status**: Ensure you're working with a clean state
+2. **Review dependencies**: Understand what components depend on your changes
+3. **Check build system**: Review [global.mk](mdc:global.mk) for relevant variables
+
+## Building the Project
+- Follow the out-of-tree configure flow and target descriptions captured in [build-system.mdc](mdc:.cursor/rules/build-system.mdc)
+- For day-to-day work, rebuild only what changed (`make` in a component directory) or drive a full rebuild from your chosen build directory
+- When builds misbehave, fall back to the clean targets described there (`clean`, `spotless`, `relink`) before recompiling
+
+## Making Code Changes
+
+### C/C++ Changes
+1. Edit source files in component directory
+2. Update header files if interface changes
+3. Run `make depend` if adding new includes
+4. Test compilation: `make` in component directory
+5. Test functionality
+
+### Tcl Changes
+1. Edit `.tcl` files directly
+2. No compilation needed (interpreted language)
+3. Test by running the application
+4. Check for syntax errors: `tclsh -c "source file.tcl"`
+
+### Makefile Changes
+1. Edit `Makefile` in component directory
+2. Update `OBJS` if adding new source files
+3. Update `DEPEND_OBJ` if needed for `make depend`
+4. Update library dependencies if adding new libs
+5. Test build
+
+## Adding New Components
+1. Create new directory in root
+2. Create `Makefile` following pattern from [Misc/Makefile](mdc:Misc/Makefile)
+3. Add component to `DIRS` in [Makefile.in](mdc:Makefile.in)
+4. Add dependencies in [Makefile.in](mdc:Makefile.in) if needed
+5. Update `global.mk` if adding new library variables
+6. Run `configure` to regenerate build files
+7. Test build
+
+## Adding New Files to Existing Component
+1. Add source file to component directory
+2. Update `Makefile`:
+   - Add to `OBJS` list
+   - Add to `DEPEND_OBJ` if C/C++ file
+3. Run `make depend` to update dependencies
+4. Test build
+
+## Testing Changes
+1. **Compile test**: Ensure code compiles without warnings
+2. **Link test**: Ensure libraries/programs link correctly
+3. **Runtime test**: Test functionality in application
+4. **Regression test**: Ensure existing functionality still works
+
+## Debugging
+- Use `-g` flag (default in debug builds)
+- Use `gdb` or `lldb` for C/C++ debugging
+- Tcl errors show in console/stderr
+- Check `staden_config.h` for debug macros
+- Use `-debug N` option in gap5 for debug output
+
+## Common Issues
+
+### Build Failures
+- Check `configure` output for missing dependencies
+- Verify library paths are correct
+- Check `system.mk` for correct compiler flags
+- Ensure `LD_LIBRARY_PATH` includes library directory
+
+### Linking Errors
+- Check library dependencies in `Makefile`
+- Verify library order in link command
+- Check for missing `-L` flags
+- Verify shared libraries are built
+
+### Runtime Errors
+- Check error messages in console
+- Verify database format compatibility
+- Check file permissions
+- Verify environment variables (e.g., `RAWDATA`)
+
+## Version Control
+- This is a legacy codebase, may not use modern VCS
+- Check for `.git`, `.svn`, or other VCS directories
+- Follow project's version control practices
+- Document changes in code comments
+
+## Documentation
+- Update comments when changing functions
+- Update [NEWS](mdc:NEWS) for user-visible changes
+- Update [ChangeLog](mdc:ChangeLog) for detailed changes
+- Update [README.build](mdc:README.build) if build process changes
+
+## Portability Considerations
+- Test on target platforms (Linux, macOS, Windows)
+- Check for platform-specific code paths
+- Use `os.h` abstractions for OS differences
+- Test with different compiler versions if possible
+
+## Performance Considerations
+- Profile before optimizing
+- Use appropriate data structures
+- Consider cache behavior for large datasets
+- Test with realistic data sizes
+
+## Code Review Checklist
+- [ ] Code compiles without warnings
+- [ ] Code follows project conventions
+- [ ] Dependencies are correctly specified
+- [ ] Error handling is appropriate
+- [ ] Memory management is correct
+- [ ] Comments are clear and accurate
+- [ ] No platform-specific assumptions
+- [ ] Tests pass (if applicable)

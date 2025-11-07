@@ -1,0 +1,129 @@
+---
+globs: *.tcl
+---
+# Tcl/Tk Coding Conventions
+
+## File Structure
+- Tcl files are in component directories (gap4/, gap5/, spin/, etc.)
+- Main entry points: `gap4/gap.tcl`, `gap5/gap5.tcl`, `spin/spin.tcl`
+- GUI code mixed with logic (no strict separation)
+
+## Procedure Naming
+- Procedures use lowercase with underscores or camelCase
+- Global procedures: Component prefix (e.g., `gap5_usage`, `gap4_...`)
+- Local procedures: No prefix needed
+- See [gap5/gap5.tcl](mdc:gap5/gap5.tcl) for examples
+
+## Global Variables
+- Use `global` command to access global variables
+- Common globals:
+  - `gap5_defs` - Configuration definitions
+  - `io` - Database I/O handle
+  - Component-specific globals (e.g., `maxseq`, `licence`)
+
+## Error Handling
+- Use `verror` function for errors:
+  - `verror ERR_FATAL "Component" "Error message"`
+  - `verror ERR_WARN "Component" "Warning message"`
+- Use `catch` for error handling:
+  ```tcl
+  if {[catch {command} err]} {
+      # Handle error
+  }
+  ```
+
+## Tk Widget Creation
+- Use helper functions from `tk_utils/`:
+  - `xtoplevel` - Create toplevel windows
+  - `entrybox` - Entry widgets
+  - `xyesno` - Yes/No dialogs
+  - See `tk_utils/` for widget extensions
+
+## Widget Naming
+- Use hierarchical naming: `$w.button`, `$w.frame.label`
+- `$w` typically holds the toplevel or parent widget
+- Example from [gap5/gap5.tcl](mdc:gap5/gap5.tcl):
+  ```tcl
+  set t [keylget gap5_defs COPY_DATABASE.WIN]
+  if {[xtoplevel $t -resizable 0] == ""} return
+  entrybox $t.entry -title "New version character"
+  ```
+
+## Keylget/Keylset Pattern
+- Configuration stored in keyed lists (keylget/keylset)
+- Access via: `[keylget gap5_defs KEY_NAME]`
+- See usage in [gap5/gap5.tcl](mdc:gap5/gap5.tcl)
+
+## Tcl/Tk Version
+- Requires Tcl/Tk >= 8.4
+- Tested with Tcl/Tk 8.6
+- Uses TEA (Tcl Extension Architecture) for extensions
+
+## File I/O
+- Use standard Tcl file commands
+- Binary mode on Windows: `open $file rb` or `open $file wb`
+- Check for file existence: `[file exists $file]`
+
+## String Formatting
+- Use `format` for formatted output:
+  ```tcl
+  format "No. Contigs         %12d\n" $nc
+  ```
+- Build strings with `append`:
+  ```tcl
+  set i ""
+  append i [format "No. Contigs         %12d\n" $nc]
+  ```
+
+## Command Line Arguments
+- Access via `$argv` list
+- Check for help: `[lindex $argv 1] == "-h"`
+- Parse options before `tkinit` call
+
+## Database I/O
+- Database operations use C extensions
+- Access via `$io` handle: `set db [$io get_database]`
+- Contig operations: `set c [$io get_contig $cnum]`
+- Always call `$c delete` when done with contig objects
+
+## Event Handling
+- Use standard Tcl event binding
+- Button commands: `-command "procedure_name"`
+- Bind events: `bind $widget <Event> "command"`
+
+## Window Management
+- Use `wm title` for window titles
+- `wm withdraw` to hide windows
+- `wm transient` for dialog windows
+- `wm overrideredirect` for splash screens
+
+## Tcl Extension Loading
+- Extensions loaded via `load` command or `package require`
+- C extensions are shared libraries loaded at runtime
+- Tcl extensions in `tk_utils/` provide widget extensions
+
+## Comments
+- Use `#` for comments
+- Header comments include copyright notice
+- Procedure comments describe usage
+
+## Common Patterns
+- File existence check:
+  ```tcl
+  if {[file exists $file]} {
+      # Process file
+  }
+  ```
+- Error handling:
+  ```tcl
+  if {[catch {command} err]} {
+      verror ERR_WARN "Component" "Error: $err"
+      return
+  }
+  ```
+- Dialog creation:
+  ```tcl
+  set t [keylget gap5_defs DIALOG.WIN]
+  if {[xtoplevel $t] == ""} return
+  wm title $t "Dialog Title"
+  ```

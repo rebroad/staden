@@ -1,0 +1,94 @@
+---
+globs: Makefile,*.mk,configure.in,*.m4
+---
+# Build System Conventions
+
+## Makefile Structure
+All Makefiles follow this pattern:
+1. Define `LIBS` and/or `PROGS` variables
+2. Include `$(SRCROOT)/global.mk`
+3. Include `../system.mk` (for subdirectories)
+4. Set `SRCROOT=$(SRC)/..` to reference parent directory
+5. Define object files and dependencies
+6. Use standard targets: `all`, `clean`, `install`, `depend`
+
+See [Misc/Makefile](mdc:Misc/Makefile) for a typical example.
+
+## Global Makefile Variables
+From [global.mk](mdc:global.mk):
+- `$(L)` - Library directory path
+- `$(SRCROOT)` - Root of source tree
+- `$(O)` - Object file directory (usually `.`)
+- `$(SHLIB_PREFIX)` - Shared library prefix (e.g., `lib`)
+- `$(SHLIB_SUFFIX)` - Shared library suffix (e.g., `.so` or `.dylib`)
+- `$(INSTALLBIN)`, `$(INSTALLLIB)`, etc. - Installation directories
+
+## Compilation Flags
+- `CFLAGS` includes `$(COPTDEBUG)`, `$(DEFINES)`, `$(INCLUDES)`
+- `SHLIB_CFLAGS` - Flags for building shared libraries
+- Debug builds: `COPTDEBUG=$(CDEBUG)` (typically `-g`)
+- Release builds: `COPTDEBUG=$(COPT)` (typically `-O2 -g3`)
+
+## Library Dependencies
+Libraries are defined in [global.mk](mdc:global.mk):
+- `MISC_LIB` - Core utilities
+- `TCL_LIB`, `TK_LIB` - Tcl/Tk libraries
+- `SEQUTILS_LIB` - Sequence utilities
+- `TKUTILS_LIB` - Tcl/Tk widgets
+- `GAP_LIB`, `GAP4_LIB` - Gap database libraries
+- `MUT_LIB` - Mutation analysis (C++)
+- `P3_LIB` - Primer3 library
+
+## Include Paths
+- `INCLUDES_S` - Start of include path
+- `INCLUDES_E` - End of include path
+- `-I$(SRC)` - Source directory
+- `-I$(BUILD)` - Build directory (for generated headers)
+
+## Build Directory Structure
+**IMPORTANT**: Never run `configure` in the root directory. Always:
+```bash
+cd src
+mkdir build.myhost
+cd build.myhost
+../configure [options]
+make
+```
+
+## Dependency Building
+- Use `make depend` to generate dependencies
+- Dependencies are stored in Makefile after `# DO NOT DELETE THIS LINE`
+- `makedepend` is used to generate dependency information
+
+## Shared Library Building
+- Libraries use `$(SHLIB_LD)` and `$(SHLIB_LDFLAGS)` for linking
+- Output: `$(L)/$(SHLIB_PREFIX)$(LIBS)$(SHLIB_SUFFIX)`
+- Windows: Also generates `.def` files for exports
+
+## Installation
+- `make install` copies libraries to `$(INSTALLLIB)`
+- Executables go to `$(INSTALLBIN)`
+- Scripts go to `$(INSTALLSCRIPT)`
+- Default prefix: `/usr/local/staden` (configurable via `--prefix`)
+
+## Cross-Platform Considerations
+- Windows: Uses MinGW/MSys, requires `.def` files
+- macOS: Requires X11 Tcl/Tk (not Aqua), may need fat binaries
+- Linux: Standard autoconf build
+
+## Configure Script Options
+See [configure.in](mdc:configure.in) for available options:
+- `--with-io_lib=DIR` - io_lib location
+- `--with-tcl=DIR`, `--with-tk=DIR` - Tcl/Tk locations
+- `--with-zlib=DIR`, `--with-lzma=DIR` - Compression libraries
+- `--prefix=DIR` - Installation prefix
+
+## Build Dependencies Order
+From [Makefile.in](mdc:Makefile.in), components build in this order:
+1. `Misc` (foundation)
+2. `tk_utils`, `text_utils` (depend on Misc)
+3. `seq_utils` (depends on Misc, text_utils, tk_utils)
+4. `mutlib` (depends on Misc, seq_utils)
+5. `g` (depends on Misc)
+6. `gap4` (depends on g, seq_utils, mutlib, primer3)
+7. `gap5` (depends on seq_utils, primer3)

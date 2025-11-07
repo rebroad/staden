@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+# Staden Sequence Analysis Package - Project Overview
+
+## Project Description
+The Staden Sequence Analysis Package is a bioinformatics software suite for DNA sequence assembly, editing, and analysis. It includes:
+
+- **Gap4**: Sequence assembly editor (legacy)
+- **Gap5**: Next-generation sequencing assembly editor
+- **Pregap4**: Preprocessing pipeline for Gap4
+- **Spin**: Sequence analysis and visualization
+- **Trev**: Trace viewer
+- **Primer3**: Primer design integration
+- Various utility tools for sequence manipulation
+
+## Technology Stack
+- **Languages**: C, C++, Tcl/Tk, Fortran (legacy)
+- **Build System**: GNU Autoconf/Automake with custom Makefiles
+- **GUI Framework**: Tcl/Tk (X11, not Aqua on macOS)
+- **External Dependencies**:
+  - staden-io_lib (>=1.13.8)
+  - Tcl/Tk (>=8.4)
+  - zlib, liblzma, libpng, curl
+  - tklib, itcl/itk/iwidgets (optional for prefinish)
+
+## Project Structure
+- Monorepo rooted at `staden/`, with native code, Tcl/Tk scripts, and data living side-by-side
+- Libraries and tools are grouped by responsibility (e.g., `Misc/` for core utilities, `seq_utils/` for sequence helpers)
+- GUI applications (Gap4/Gap5/Pregap4/Spin/Trev) each live in their own top-level directory
+- For a directory-by-directory breakdown and naming rules, see [file-organization.mdc](mdc:.cursor/rules/file-organization.mdc)
+
+## Build & Workflow Resources
+- Build orchestration, configure options, and library linkage are documented in [build-system.mdc](mdc:.cursor/rules/build-system.mdc)
+- Day-to-day development practices and testing guidance are in [development-workflow.mdc](mdc:.cursor/rules/development-workflow.mdc)
+
+## Documentation
+- [README.build](mdc:README.build) - Build instructions
+- [NEWS](mdc:NEWS) - Release notes and changelog
+- [ChangeLog](mdc:ChangeLog) - Detailed change history

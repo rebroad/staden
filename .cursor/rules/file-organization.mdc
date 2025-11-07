@@ -1,0 +1,117 @@
+---
+alwaysApply: true
+---
+# File Organization and Naming Conventions
+
+## Directory Structure
+Each component directory typically contains:
+- `*.c`, `*.cpp` - C/C++ source files
+- `*.h`, `*.hpp` - Header files
+- `*.tcl` - Tcl/Tk scripts
+- `Makefile` - Build instructions
+- Data files (if component-specific)
+
+## Source File Naming
+- C files: `component_name.c` (e.g., `error.c`, `files.c`)
+- Header files: `component_name.h` (e.g., `error.h`, `files.h`)
+- Tcl files: `feature.tcl` (e.g., `gap5.tcl`, `contig_editor.tcl`)
+- Makefiles: Always `Makefile` (not `makefile`)
+
+## Library Organization
+### Misc/ (Core Utilities)
+Foundation library with:
+- Memory management (`xalloc.c`, `xalloc.h`)
+- Error handling (`error.c`, `error.h`, `xerror.c`, `xerror.h`)
+- File operations (`files.c`, `files.h`, `getfile.c`, `getfile.h`)
+- String utilities (`strings.c`, `dstring.c`, `string_alloc.c`)
+- OS abstraction (`os.h`, `win_funcs.c` for Windows)
+
+### seq_utils/ (Sequence Utilities)
+- Sequence manipulation functions
+- Depends on `Misc/`, `text_utils/`, `tk_utils/`
+
+### tk_utils/ (Tcl/Tk Widgets)
+- Tcl/Tk widget extensions
+- GUI helper functions
+- Help system integration
+
+### text_utils/ (Text Processing)
+- Text manipulation utilities
+- Depends on `Misc/`
+
+## Program Organization
+### gap4/ (Legacy Assembly Editor)
+- Main: `gap.tcl`
+- Contig editor: `contig_editor.tcl`
+- Various feature modules (`.tcl` files)
+- C library: `libgap.so` (or equivalent)
+- Many `.c` and `.h` files for database operations
+
+### gap5/ (NGS Assembly Editor)
+- Main: `gap5.tcl`
+- Contig editor: `contig_editor.tcl`
+- Template display: `template_display.tcl`
+- Database operations in C
+- Many feature-specific `.tcl` files
+
+### spin/ (Sequence Analysis)
+- Main: `spin.tcl`
+- Various analysis modules
+- Sequence browser and editor
+
+## Build Output Organization
+- Object files: In build directory (same structure as source)
+- Libraries: `$(L)/lib*.so` (or `.dylib` on macOS, `.dll` on Windows)
+- Executables: Built in component directories, installed to `$(INSTALLBIN)`
+- Scripts: Installed to `$(INSTALLSCRIPT)`
+
+## Header File Inclusion
+- Project headers: Use quotes `#include "header.h"`
+- System headers: Use angle brackets `#include <stdio.h>`
+- Config header: `#include "staden_config.h"` or `#include "$(PWD)/staden_config.h"`
+
+## Makefile Location
+- Each component has its own `Makefile`
+- Root has `Makefile.in` (template for autoconf)
+- `global.mk` contains shared definitions
+- `system.mk` (generated) contains system-specific settings
+
+## Data Files
+- Reference data in `data/` directory:
+  - `data/vectors/` - Vector sequences
+  - `data/gcodes/` - Genetic codes
+  - `data/alus/` - Alu sequences
+  - Restriction enzyme data
+- Component-specific data in component directories
+
+## Documentation Files
+- `README.build` - Build instructions
+- `NEWS` - Release notes
+- `ChangeLog` - Detailed change history
+- `LICENCE.txt`, `LICENCE.rtf` - License information
+
+## Generated Files
+- `staden_config.h` - Generated from `staden_config.h.in`
+- `system.mk` - Generated from `system.mk.in`
+- `shlib.conf` - Generated from `shlib.conf.in`
+- Scripts with `.in` extension are templates
+
+## Test Files
+- Test files typically in component directories
+- Some components have test subdirectories
+- Test naming: `*_test.c` or `test_*.c`
+
+## Platform-Specific Files
+- Windows: `win_funcs.c` in `Misc/`
+- macOS: Build notes in `README.build`
+- Unix/Linux: Standard POSIX code
+
+## Temporary Files
+- Build artifacts in build directory
+- Use `/tmp` for temporary files during build
+- Clean targets remove `.o`, `.a` files
+
+## Dependency Files
+- Dependencies in Makefiles after `# DO NOT DELETE THIS LINE`
+- Generated via `make depend`
+- Uses `makedepend` utility
